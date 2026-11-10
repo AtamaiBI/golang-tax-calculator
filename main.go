@@ -4,8 +4,6 @@ import ("fmt"
 )
 
 
-
-
 func main(){
 
 	// For every price calculate the price  with the tax rate
