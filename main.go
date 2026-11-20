@@ -1,47 +1,52 @@
 package main
 
-import ("fmt"
+import (
+
+	"taxcalculator/prices"
+	"fmt"
+	"taxcalculator/printtable"
 )
 
+func main() {
 
-func main(){
+sampletaxRates := []float64{0, 0.07, 0.1, 0.15}
 
-	// For every price calculate the price  with the tax rate
+var records []map[string]float64
 
-var prices []float64 = []float64{10,20,30}
-taxRates := []float64{0,0.07,0.1,0.15}
+var record map[string]float64
 
-// map of float keys and float values
-/* In Go, the built-in make function is used exclusively to initialize and allocate slices, maps, and channels. Unlike new, which returns a pointer to zeroed memory, make allocates space on the heap, initializes the underlying data structure, and returns an initialized value (not a pointer) that is ready for immediate use.*/
-result := make(map[float64][]float64)
-
-/* In Go, the for ... range loop uses positional assignment based strictly on the data structure you are iterating over. Go’s compiler determines what variables represent entirely by their order—the first variable is always the index (or key), and the second variable is always the value. */
+var err error
 
 
-for index, val := range prices {
-	fmt.Println(index)
-	fmt.Println(val)
+
+for _, taxRate := range sampletaxRates {
+	// Creates a new TaxIncludedPriceJob Struct
+	prices := prices.NewTaxIncludedPriceJob(taxRate)
+	// Calls the Process function on prices struct
+	err, record = prices.Process()
+
+
+if err != nil {
+	fmt.Println(err)
+}
+records = append(records, record)
 }
 
-fmt.Println(taxRates)
-fmt.Println(result)
+fmt.Println(records)
 
-for _, taxRate := range taxRates {
-	// make a slice of capacity 3
-taxIncludedPrices := make([]float64, len(prices))
-// In for loops the 1st position is always the index and the 2nd the value
-for index, price := range prices {
-	// add the results to the slice
-	taxIncludedPrices[index] = price * (1 + taxRate)
-}
-// add the results to the map
-result[taxRate] = taxIncludedPrices
+printtable.PrintTable(records)
+
+for p := range records[0] {
+	fmt.Println(p)
 }
 
-fmt.Println(result)
+for key := range records {
+	fmt.Println("Key Name" , records[key])
+}
+
+fmt.Println(records[1]["12.00"]) // The map value at row 2, key = "12.00"
+
+fmt.Println(records[1]) // The map at row 2
 
 
-
-
-} // End Main
-
+} // end main
