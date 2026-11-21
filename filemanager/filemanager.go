@@ -9,10 +9,17 @@ import (
 
 )
 
-// Receives a string filepath and returns a slice of floats or and error
-func ReadLines(filepath string) ([]float64, error) {
+type FileManager struct {
+InputFilePath string
+OutputFilePath string
+}
 
-file, err := os.Open(filepath)
+
+
+// Receives a string filepath and returns a slice of floats or and error
+func (fm *FileManager) ReadLines() ([]float64, error) {
+
+file, err := os.Open(fm.InputFilePath)
 	if err != nil {
 		return nil, errors.New("Failed to open file")
 	}
@@ -49,8 +56,10 @@ Why interface{} Works Here
 • Runtime Reflection: Under the hood, encoding/json (like json.Marshal(data)) uses Go's reflect package to inspect the underlying type and fields of data at runtime and convert them into JSON text.
 */
 
-func WriteJSON(path string,data any) error {
-	file, err := os.Create(path)
+// 
+func (fm *FileManager) WriteResult(data any) error {
+
+	file, err := os.Create(fm.OutputFilePath)
 	if err != nil {
 		return err
 	}
@@ -72,4 +81,11 @@ if [initialization statement]; [boolean condition] {// runs if condition is true
 	}
 	return nil
 
+}
+
+func New(inputFilePath string, outputFilePath string) *FileManager {
+	return &FileManager{
+		InputFilePath: inputFilePath,
+		OutputFilePath: outputFilePath,
+	}
 }

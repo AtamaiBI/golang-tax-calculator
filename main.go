@@ -1,15 +1,15 @@
 package main
 
 import (
-
-	"taxcalculator/prices"
 	"fmt"
+	"taxcalculator/filemanager"
+	"taxcalculator/prices"
 	"taxcalculator/printtable"
 )
 
 func main() {
 
-sampletaxRates := []float64{0, 0.07, 0.1, 0.15}
+sampletaxRates := []float64{0, 0.07, 0.1, 0.50}
 
 var records []map[string]float64
 
@@ -19,9 +19,12 @@ var err error
 
 
 
+
 for _, taxRate := range sampletaxRates {
+	// Filemanager.New() returns a pointer to a filemanager struct therefore in the prices constructor I must dereference fm as prices is expecting a copy not a pointer. I can change the prices constructor to accept a pointer, which I have done.
+	fm := filemanager.New("prices.txt",fmt.Sprintf("result_%.0f.json",taxRate * 100))
 	// Creates a new TaxIncludedPriceJob Struct
-	prices := prices.NewTaxIncludedPriceJob(taxRate)
+	prices := prices.NewTaxIncludedPriceJob(taxRate,fm)
 	// Calls the Process function on prices struct
 	err, record = prices.Process()
 

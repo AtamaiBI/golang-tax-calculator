@@ -8,26 +8,28 @@ import (
 )
 
 type TaxIncludedPriceJob struct {
-	TaxRate           float64
-	InputPrices       []float64
-	TaxIncludedPrices map[string]float64
+	TaxRate           float64 `json:"tax_rate"`
+	InputPrices       []float64 `json:"input_prices"`
+	TaxIncludedPrices map[string]float64 `json:"tax_included_prices"`
+	IOManager         filemanager.FileManager
 }
 
 // Add a constructor function for the struct. Returns a pointer to a struct.
-func NewTaxIncludedPriceJob(taxRate float64) *TaxIncludedPriceJob {
+func NewTaxIncludedPriceJob(taxRate float64, fm *filemanager.FileManager) *TaxIncludedPriceJob {
 
 	return &TaxIncludedPriceJob{
 		//InputPrices:       []float64{10, 20, 30}, // will read values in InputPrices later
 		InputPrices:       []float64{},
 		TaxRate:           taxRate,
 		TaxIncludedPrices: make(map[string]float64),
+		IOManager:          *fm,
 	}
 }
 
 // Receiver functon iterates over the struct and prints the result map of prices with tax. Must have a pointer parameter as the constructor returns a pointer and we want to work with that rather than a copy
 func (job *TaxIncludedPriceJob) Process() (error, map[string]float64) {
 
-	err := job.LoadData("prices.txt")
+	err := job.LoadData()
 
 	if err != nil {
 		fmt.Println(err)
@@ -42,21 +44,21 @@ func (job *TaxIncludedPriceJob) Process() (error, map[string]float64) {
 		result[fmt.Sprintf("%.2f", price)] = conversion.RoundToTwo(taxIncludedPrice)
 	}
 
-	// Special if statement. The first part is the expression and the
-	if err := filemanager.WriteJSON(fmt.Sprintf("result_%.0f.json",job.TaxRate*100),result); err != nil {
+	// Special if statement. The first part is the expression and the second part after ; is the test
+	if err := job.IOManager.WriteResult(result); err != nil {
 		fmt.Println(err)
 	}
 
 	// fmt.Println(result) // prints a map of prices with tax for a single tax rates
 	return nil, result
 
-} // end func
+} // ------------ END FUNC ---------------------------------------
 
 // receiver function on a pointer to add a list of prices to the struct. If this receiver func wasn't a pointer then the update to its fields would be on a copy of the struct
-func (job *TaxIncludedPriceJob) LoadData(filepath string) error {
+func (job *TaxIncludedPriceJob) LoadData() error {
 
 var err error
-	job.InputPrices, err =  filemanager.ReadLines(filepath)// adds a slice of prices to the TaxIncludedPriceJob struct which is a pointer
+	job.InputPrices, err =  job.IOManager.ReadLines()// adds a slice of prices to the TaxIncludedPriceJob struct which is a pointer
 	// If successful return nil as not error occurred
 if err != nil {
 
