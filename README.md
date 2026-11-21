@@ -1,0 +1,1 @@
+[![Architecture diagram of atamaibi/golang-tax-calculator](https://gitdiagram.com/atamaibi/golang-tax-calculator/diagram.png)](https://gitdiagram.com/atamaibi/golang-tax-calculator?utm_source=readme&utm_medium=picture)
