@@ -11,7 +11,8 @@ type TaxIncludedPriceJob struct {
 	TaxRate           float64 `json:"tax_rate"`
 	InputPrices       []float64 `json:"input_prices"`
 	TaxIncludedPrices map[string]float64 `json:"tax_included_prices"`
-	IOManager         filemanager.FileManager
+	IOManager         filemanager.FileManager `json:"-"` // "-" means ignore this key and value in the output
+
 }
 
 // Add a constructor function for the struct. Returns a pointer to a struct.
@@ -25,6 +26,12 @@ func NewTaxIncludedPriceJob(taxRate float64, fm *filemanager.FileManager) *TaxIn
 		IOManager:          *fm,
 	}
 }
+
+type ResultLineHandler interface {
+	WriteResult(data any) error
+	ReadLines() ([]string, error)
+}
+
 
 // Receiver functon iterates over the struct and prints the result map of prices with tax. Must have a pointer parameter as the constructor returns a pointer and we want to work with that rather than a copy
 func (job *TaxIncludedPriceJob) Process() (error, map[string]float64) {
@@ -58,7 +65,7 @@ func (job *TaxIncludedPriceJob) Process() (error, map[string]float64) {
 func (job *TaxIncludedPriceJob) LoadData() error {
 
 var err error
-	job.InputPrices, err =  job.IOManager.ReadLines()// adds a slice of prices to the TaxIncludedPriceJob struct which is a pointer
+	job.InputPrices, err =  job.IOManager.ReadLines()// adds a slice of prices to the TaxIncludedPriceJob struct which is a pointer. Because IOManager (a filemanager type)
 	// If successful return nil as not error occurred
 if err != nil {
 

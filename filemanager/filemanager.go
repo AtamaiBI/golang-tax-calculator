@@ -16,7 +16,7 @@ OutputFilePath string
 
 
 
-// Receives a string filepath and returns a slice of floats or and error
+// Operates on the filemanager type which contains a field for the input path to the file to read. Returns a slice of floats or and error
 func (fm *FileManager) ReadLines() ([]float64, error) {
 
 file, err := os.Open(fm.InputFilePath)
@@ -56,7 +56,7 @@ Why interface{} Works Here
 • Runtime Reflection: Under the hood, encoding/json (like json.Marshal(data)) uses Go's reflect package to inspect the underlying type and fields of data at runtime and convert them into JSON text.
 */
 
-// 
+//
 func (fm *FileManager) WriteResult(data any) error {
 
 	file, err := os.Create(fm.OutputFilePath)
