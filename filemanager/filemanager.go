@@ -83,6 +83,7 @@ if [initialization statement]; [boolean condition] {// runs if condition is true
 
 }
 
+// Constructor returns a pointer
 func New(inputFilePath string, outputFilePath string) *FileManager {
 	return &FileManager{
 		InputFilePath: inputFilePath,

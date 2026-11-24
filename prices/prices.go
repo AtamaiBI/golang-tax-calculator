@@ -4,33 +4,31 @@ import (
 	//"bufio"
 	"fmt"
 	"taxcalculator/conversion"
-	"taxcalculator/filemanager"
+	//"taxcalculator/filemanager"
+	"taxcalculator/iomanager"
 )
 
 type TaxIncludedPriceJob struct {
 	TaxRate           float64 `json:"tax_rate"`
 	InputPrices       []float64 `json:"input_prices"`
 	TaxIncludedPrices map[string]float64 `json:"tax_included_prices"`
-	IOManager         filemanager.FileManager `json:"-"` // "-" means ignore this key and value in the output
+	IOManager         iomanager.IOManager `json:"-"` // "-" means ignore this key and value in the output
 
 }
 
 // Add a constructor function for the struct. Returns a pointer to a struct.
-func NewTaxIncludedPriceJob(taxRate float64, fm *filemanager.FileManager) *TaxIncludedPriceJob {
+func NewTaxIncludedPriceJob(taxRate float64, io iomanager.IOManager) *TaxIncludedPriceJob {
 
 	return &TaxIncludedPriceJob{
 		//InputPrices:       []float64{10, 20, 30}, // will read values in InputPrices later
 		InputPrices:       []float64{},
 		TaxRate:           taxRate,
 		TaxIncludedPrices: make(map[string]float64),
-		IOManager:          *fm,
+		IOManager:          io,
 	}
 }
 
-type ResultLineHandler interface {
-	WriteResult(data any) error
-	ReadLines() ([]string, error)
-}
+
 
 
 // Receiver functon iterates over the struct and prints the result map of prices with tax. Must have a pointer parameter as the constructor returns a pointer and we want to work with that rather than a copy
@@ -53,7 +51,7 @@ func (job *TaxIncludedPriceJob) Process() (error, map[string]float64) {
 
 	// Special if statement. The first part is the expression and the second part after ; is the test
 	if err := job.IOManager.WriteResult(result); err != nil {
-		fmt.Println(err)
+		return err, nil
 	}
 
 	// fmt.Println(result) // prints a map of prices with tax for a single tax rates
