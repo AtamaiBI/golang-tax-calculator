@@ -11,6 +11,7 @@ type TaxRate struct {
 	TaxRates []float64 `json:"tax_rates"`
 }
 
+
 func NewTaxRate() *TaxRate {
 	return &TaxRate{}
 }

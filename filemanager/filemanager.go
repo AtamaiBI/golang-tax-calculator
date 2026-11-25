@@ -64,6 +64,7 @@ func (fm *FileManager) WriteResult(data any) error {
 		return err
 	}
 	defer file.Close()
+	/* (Note: Just be aware that defer file.Close() ignores any disk-flush errors that occur when closing a newly written file. For small CLI projects this is totally fine, though in production file writers people often check file.Close() explicitly.) */
 
 	encoder := json.NewEncoder(file)
 
@@ -76,10 +77,8 @@ go
 if [initialization statement]; [boolean condition] {// runs if condition is true
 }
 */
-	if err := encoder.Encode(data); err != nil {
-		return err
-	}
-	return nil
+// Encode writes the values in data to a json file and returns an error if one is present. No need for an if..errror..check
+	return encoder.Encode(data)
 
 }
 

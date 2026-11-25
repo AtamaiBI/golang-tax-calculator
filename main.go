@@ -19,7 +19,7 @@ func main() {
 
 	var err error
 
-	cmd := cmdmanager.New(nil)
+	cmd := cmdmanager.New()
 	taxRates := taxrates.NewTaxRate()
 	taxRates, err = taxRates.ReadTaxRates("taxrates.txt")
 
@@ -28,19 +28,28 @@ func main() {
 		return
 	}
 
+/* With struct embedding, you pass fm into cmdmanager.New(fm) once, and cmd automatically satisfies your IOManager interface (ReadLines() from CMDManager + WriteResult() promoted from FileManager): */
 
 	for _, taxRate := range taxRates.TaxRates {
 		// Filemanager.New() returns a pointer to a filemanager struct therefore in the prices constructor I must dereference fm as prices is expecting a copy not a pointer. I can change the prices constructor to accept a pointer, which I have done.
-		fm := filemanager.New("prices.txt", fmt.Sprintf("result_%.0f.json", taxRate*100))
-		cmd.SetFileManager(fm)
+fm := filemanager.New("prices.txt", fmt.Sprintf("result_%.0f.json", taxRate*100))
+		//cmd.SetFileManager(fm)
+// cmd.FileManager = fm
 
-		// Creates a new TaxIncludedPriceJob Struct that accepts a taxrate value and a filemanager struct. This allows you to access the filemanager functions from the prices struct.
-		prices := prices.NewTaxIncludedPriceJob(taxRate, cmd)
+		// Creates a new TaxIncludedPriceJob Struct that accepts a taxrate value and a cmd and filemanager struct that implements the functions within the iomanager interfaces. This allows you to access the filemanager functions from the prices struct.
+		/*
+Why This Pattern Shines
+• Zero coupling: cmdmanager and filemanager have no dependencies on each other.
+• Easy to swap: If you later add a ConsoleWriter that prints JSON to the screen instead of saving a file, you only implement WriteResult(data any) error without touching CMDManager or FileManager.
+• Effortless testing: To unit-test TaxIncludedPriceJob.Process(), you can pass in tiny mock structs that only implement ReadLines() or WriteResult().
+*/
+		prices := prices.NewTaxIncludedPriceJob(taxRate, cmd, fm)
 		// Calls the Process function on prices struct
-		err, record = prices.Process()
+		record ,err = prices.Process()
 
 		if err != nil {
 			fmt.Println(err)
+			continue
 		}
 		records = append(records, record)
 	}
