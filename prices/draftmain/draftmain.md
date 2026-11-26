@@ -1,4 +1,4 @@
-//package draftmain
+package draftmain
 
 //import (
 //	"fmt"
